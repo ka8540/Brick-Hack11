@@ -47,7 +47,7 @@ stream = p.open(
 )
 
 # Connect to MongoDB
-MONGO_URI = "mongodb://lumen_admin:kush@127.0.0.1:27017/lumeo_db?authSource=lumeo_db"
+MONGO_URI = "mongodb://localhost:27017/lumeo_db"
 client = MongoClient(MONGO_URI)
 db = client["lumeo_db"]  # Database name
 transcripts_collection = db["transcripts"]  # Collection name
@@ -215,6 +215,12 @@ def init_db():
 async def start():
     """Initialize chat session"""
     init_db()  
+    cl.user_session.set(
+        "message_history",
+        [{"role": "Lumeo", "content": "👋🏽 Hi there, Press 'P' to start or stop talking with me"}],
+    )
+    await cl.Message(content = "👋🏽 Hi there, Press 'P' to start or stop talking with me",
+                     author = "Lumeo").send()
     cl.user_session.set("track_id", str(uuid4()))
     client = await setup_client()
     cl.user_session.set("client", client)
@@ -225,8 +231,31 @@ async def start():
     asyncio.create_task(audio_playback())
     asyncio.create_task(buffer_monitor())
     
-    await cl.Message(content = "👋🏽 Hi there, Press 'P' to start or stop talking with me",
-                     author = "Lumeo").send()
+    # await cl.Message(content = "👋🏽 Hi there, Press 'P' to start or stop talking with me",
+    #                  author = "Lumeo").send()
+
+
+@cl.on_message
+async def on_message(message: cl.Message):
+    message_history = cl.user_session.get("message_history")
+    message_history.append({"author": "Lumeo", "content": message.content})
+    msg = cl.Message(content="Hello",author="Lumeo")
+    await msg.send()
+
+    # stream = await client.chat.completions.create(
+    #     messages=message_history, stream=True, **settings
+    # )
+
+    # async for part in "hello":
+    #     print(part)
+    #     if token := part.choices[0].delta.content or "":
+    #         await msg.stream_token(token)
+    #         print(token)
+    
+    message_history.append(author="User", content="Hello")
+    await msg.update()
+
+
 
 async def audio_generator():
     """Async generator for audio chunks"""
@@ -298,6 +327,7 @@ async def on_audio_chunk(chunk: cl.InputAudioChunk):
 @cl.on_audio_end
 async def on_audio_end():
     """Handles end of user audio input"""
+    
     await cl.user_session.get("audio_chunks").put(None)
 
 @cl.on_stop

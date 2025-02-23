@@ -1,0 +1,59 @@
+{
+  "hash": "54f1d12d",
+  "browserHash": "8510a096",
+  "optimized": {
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "caeb3127",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "8c63abed",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "96da7a7a",
+      "needsInterop": true
+    },
+    "recoil": {
+      "src": "../../node_modules/recoil/es/index.js",
+      "file": "recoil.js",
+      "fileHash": "bae74c0e",
+      "needsInterop": false
+    },
+    "@chainlit/react-client": {
+      "src": "../../node_modules/@chainlit/react-client/dist/index.mjs",
+      "file": "@chainlit_react-client.js",
+      "fileHash": "8a8167a2",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "0113298c",
+      "needsInterop": false
+    },
+    "framer-motion": {
+      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
+      "file": "framer-motion.js",
+      "fileHash": "06234442",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-3NK5HIRM": {
+      "file": "chunk-3NK5HIRM.js"
+    },
+    "chunk-Q2O7NE2N": {
+      "file": "chunk-Q2O7NE2N.js"
+    },
+    "chunk-B46YTOBL": {
+      "file": "chunk-B46YTOBL.js"
+    }
+  }
+}
