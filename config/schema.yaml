@@ -1,0 +1,155 @@
+# Database schema description for natural language to SQL conversion
+schema:
+  tables:
+    users:
+      description: Customer accounts in the bookstore
+      columns:
+        - name: id
+          type: integer
+          description: Primary key
+          constraints: primary key
+        - name: first_name
+          type: text
+          description: Customer's first name
+          constraints: not null
+        - name: last_name
+          type: text
+          description: Customer's last name
+          constraints: not null
+        - name: email
+          type: text
+          description: Customer's email address
+          constraints: not null
+        - name: created_at
+          type: timestamp
+          description: When the customer account was created
+          constraints: default current_timestamp
+        - name: is_active
+          type: boolean
+          description: Whether the customer account is active
+          constraints: not null
+
+    books:
+      description: Classic literature books available in the store
+      columns:
+        - name: id
+          type: integer
+          description: Primary key
+          constraints: primary key
+        - name: title
+          type: text
+          description: Book title
+          constraints: not null
+        - name: author
+          type: text
+          description: Book author
+          constraints: not null
+        - name: price
+          type: decimal
+          description: Book price in USD
+          constraints: not null
+        - name: genre
+          type: text
+          description: Book genre (e.g., Science Fiction, Literary Fiction)
+          constraints: not null
+        - name: publication_year
+          type: integer
+          description: Year when the book was first published
+          constraints: not null
+        - name: stock
+          type: integer
+          description: Current available stock
+          constraints: default 100
+
+    orders:
+      description: Customer book orders and their details
+      columns:
+        - name: id
+          type: integer
+          description: Primary key
+          constraints: primary key
+        - name: user_id
+          type: integer
+          description: Reference to the customer who placed the order
+          constraints: foreign key to users.id
+        - name: book_id
+          type: integer
+          description: Reference to the purchased book
+          constraints: foreign key to books.id
+        - name: quantity
+          type: integer
+          description: Number of books purchased
+          constraints: not null
+        - name: total_amount
+          type: decimal
+          description: Total order amount in USD
+          constraints: not null
+        - name: status
+          type: text
+          description: Order status
+          constraints: "in ('pending', 'completed', 'cancelled')"
+        - name: created_at
+          type: timestamp
+          description: When the order was placed
+          constraints: default current_timestamp
+
+  example_queries:
+    - question: "What were the most popular books last week?"
+      sql: |
+        SELECT b.title, 
+               b.author, 
+               SUM(o.quantity) as copies_sold,
+               SUM(o.total_amount) as revenue
+        FROM books b
+        JOIN orders o ON b.id = o.book_id
+        WHERE o.status = 'completed'
+        AND o.created_at >= date('now', '-7 days')
+        GROUP BY b.id, b.title, b.author
+        ORDER BY copies_sold DESC
+        LIMIT 5
+      explanation: "Lists top 5 books by number of copies sold in the last 7 days"
+
+    - question: "Who are our most valuable customers?"
+      sql: |
+        SELECT 
+            u.first_name,
+            u.last_name,
+            COUNT(o.id) as order_count,
+            SUM(o.quantity) as total_books_bought,
+            ROUND(SUM(o.total_amount), 2) as total_spent
+        FROM users u
+        JOIN orders o ON u.id = o.user_id
+        WHERE o.status = 'completed'
+        GROUP BY u.id, u.first_name, u.last_name
+        ORDER BY total_spent DESC
+        LIMIT 5
+      explanation: "Shows top 5 customers by total spending, including their order count and total books purchased"
+
+    - question: "What are the trending genres this month?"
+      sql: |
+        SELECT 
+            b.genre,
+            COUNT(DISTINCT o.id) as order_count,
+            SUM(o.quantity) as books_sold,
+            ROUND(SUM(o.total_amount), 2) as revenue
+        FROM books b
+        JOIN orders o ON b.id = o.book_id
+        WHERE o.status = 'completed'
+        AND o.created_at >= date('now', 'start of month')
+        GROUP BY b.genre
+        ORDER BY books_sold DESC
+      explanation: "Analyzes book sales by genre for the current month"
+
+    - question: "Which authors are generating the most revenue?"
+      sql: |
+        SELECT 
+            b.author,
+            COUNT(DISTINCT b.id) as books_in_store,
+            SUM(o.quantity) as total_books_sold,
+            ROUND(SUM(o.total_amount), 2) as total_revenue
+        FROM books b
+        LEFT JOIN orders o ON b.id = o.book_id AND o.status = 'completed'
+        GROUP BY b.author
+        ORDER BY total_revenue DESC
+        LIMIT 10
+      explanation: "Lists top 10 authors by revenue, including their book count and total sales" 
