@@ -1,7 +1,8 @@
 """Browser interaction tools."""
 # TODOs : add other platforms ( Windows, Linux, etc.)
 import webbrowser
-import AppKit
+import platform
+from typing import Optional
 import chainlit as cl
 from utils.common import logger
 import sys
@@ -38,36 +39,20 @@ open_browser_def = {
     },
 }
 
-def open_browser_handler(url: str):
-    """Open a URL in the default browser with proper error handling."""
+def open_browser(url: str) -> str:
+    """Open a URL in the user's default browser"""
     try:
-        logger.info(f"🌐 Opening browser URL: {url}")
-        
-        # Try detected browser first
-        browser_name = get_default_browser()
-        if browser_name == "brave":
-            brave_path = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
-            webbrowser.register('brave', None, webbrowser.BackgroundBrowser(brave_path))
-            webbrowser.get('brave').open(url)
+        # Handle macOS differently if needed
+        if platform.system() == 'Darwin':
+            # Use macOS-specific open command
+            import subprocess
+            subprocess.call(['open', url])
         else:
-            webbrowser.get().open(url)
-            
-        cl.run_sync(
-            cl.Message(
-                content=f"✅ Opened {url} in your browser"
-            ).send()
-        )
-            
-        return {"status": "success", "message": f"Opened {url} in browser"}
-    except webbrowser.Error as e:
-        error_msg = f"❌ Browser error: {str(e)}"
-        logger.error(error_msg)
-        cl.run_sync(cl.Message(content=error_msg).send())
-        return {"status": "error", "message": str(e)}
+            webbrowser.open(url)
+        return f"Successfully opened {url}"
     except Exception as e:
-        error_msg = f"❌ Unexpected error: {str(e)}"
-        logger.error(error_msg)
-        cl.run_sync(cl.Message(content=error_msg).send())
-        return {"status": "error", "message": str(e)}
+        return f"Error opening browser: {str(e)}"
+
+open_browser_handler = open_browser
 
 open_browser = (open_browser_def, open_browser_handler)

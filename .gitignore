@@ -1,1 +1,6 @@
 venv/
+tools/__pycache__/
+scratchpad
+.env
+utils/__pycache__/
+__pycache__/
