@@ -1,11 +1,14 @@
 # Lumi: Your Personal AI-Powered Productivity Assistant
 
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/8b322d79-0c53-4ade-a98f-ac3da264d867" alt="logo" width="200"/>
+</div>
+
 
 ## Overview
 
 Lumi is a cutting-edge, open-source productivity assistant designed to streamline your daily tasks and boost your efficiency. Leveraging uses Realtime API for fast speech-to-speech experiences, It understands your natural language commands and seamlessly integrates with various tools and services to help you manage your schedule, find information, automate repetitive tasks, and much more.
 
-![logo](https://github.com/user-attachments/assets/8b322d79-0c53-4ade-a98f-ac3da264d867)
 
 
 ## Features
