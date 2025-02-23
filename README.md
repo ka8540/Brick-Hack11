@@ -9,8 +9,7 @@
 
 Lumi is a cutting-edge, open-source productivity assistant designed to streamline your daily tasks and boost your efficiency. Leveraging uses Realtime API for fast speech-to-speech experiences, It understands your natural language commands and seamlessly integrates with various tools and services to help you manage your schedule, find information, automate repetitive tasks, and much more.
 
-
-
+Youtube Video : https://youtu.be/X18DxQ_3ju8
 ## Features
 <img width="1439" alt="lumihomepage" src="https://github.com/user-attachments/assets/3aad1116-0b0a-470b-a771-b262a7d20aca" />
 
