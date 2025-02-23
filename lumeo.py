@@ -137,7 +137,10 @@ async def tool_handler(msg: dict):
         if tool_tuple:
             tool_func = tool_tuple[1]
             
-            result = tool_func(**tool_params)            
+            if asyncio.iscoroutinefunction(tool_func):
+                result = await tool_func(**tool_params)  # ✅ Correct: Await async functions
+            else:
+                result = tool_func(**tool_params)           
             time.sleep(0.1)
             
             # Log tool usage
