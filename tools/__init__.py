@@ -8,6 +8,7 @@ from .linkedin import draft_linkedin_post
 from .python_file import create_python_file, execute_python_file
 from .browser import open_browser
 from .email import draft_email
+from .ytnotes import generate_youtube_notes
 
 tools = [
     query_stock_price,
@@ -19,6 +20,7 @@ tools = [
     execute_python_file,
     open_browser,
     draft_email,
+    generate_youtube_notes
 ]
 
 __all__ = ["tools"]

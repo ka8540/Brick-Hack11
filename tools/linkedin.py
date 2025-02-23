@@ -18,14 +18,14 @@ class LinkedInPost(BaseModel):
 
 draft_linkedin_post_def = {
     "name": "draft_linkedin_post",
-    "description": "Creates a LinkedIn post draft based on a given topic or content description.",
+    "description": "Creates a LinkedIn post draft and provides it for copying.",
     "parameters": {
         "type": "object",
         "properties": {
             "topic": {
                 "type": "string",
-                "description": "The topic or content description for the LinkedIn post (e.g., 'The importance of AI ethics in modern technology').",
-            },
+                "description": "The topic or content description for the LinkedIn post.",
+            }
         },
         "required": ["topic"],
     },
@@ -33,12 +33,11 @@ draft_linkedin_post_def = {
 
 
 async def draft_linkedin_post_handler(topic):
-    """Creates a LinkedIn post draft based on a given topic."""
+    """Creates a LinkedIn post draft."""
     try:
         logger.info(f"📝 Drafting LinkedIn post on topic: '{topic}'")
 
         llm = get_llm("linkedin_post")
-
         structured_llm = llm.with_structured_output(LinkedInPost)
 
         system_template = """
@@ -62,18 +61,38 @@ async def draft_linkedin_post_handler(topic):
         chain = prompt_template | structured_llm
         linkedin_post = chain.invoke({"topic": topic}).content
 
+        # Save to file
         filepath = os.path.join(scratch_pad_dir, "linkedin_post.md")
         with open(filepath, "w") as f:
             f.write(linkedin_post)
 
         logger.info(f"💾 LinkedIn post saved successfully at {filepath}")
-        await cl.Message(content=f"LinkedIn post about '{topic}':\n\n{linkedin_post}").send()
+        
+        # Send message with clear instructions
+        await cl.Message(
+            content="Here's your LinkedIn post draft:\n\n"
+                   "```\n"
+                   f"{linkedin_post}\n"
+                   "```\n\n"
+                   "📋 Copy the content above and paste it into LinkedIn's post composer.\n"
+                   "🔗 LinkedIn post composer: https://www.linkedin.com/feed/?shareActive=true",
+            author="System"
+        ).send()
 
-        return linkedin_post
+        return {
+            "content": linkedin_post,
+            "filepath": filepath,
+            "status": "success"
+        }
 
     except Exception as e:
-        logger.error(f"❌ Error drafting LinkedIn post: {str(e)}")
-        await cl.Message(content=f"An error occurred while drafting the LinkedIn post: {str(e)}").send()
+        error_msg = f"❌ Error drafting LinkedIn post: {str(e)}"
+        logger.error(error_msg)
+        await cl.Message(content=error_msg, author="System").send()
+        return {
+            "error": str(e),
+            "status": "failed"
+        }
 
 
 draft_linkedin_post = (draft_linkedin_post_def, draft_linkedin_post_handler)

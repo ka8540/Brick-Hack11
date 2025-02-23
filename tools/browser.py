@@ -38,36 +38,15 @@ open_browser_def = {
     },
 }
 
-def open_browser_handler(url: str):
-    """Open a URL in the default browser with proper error handling."""
+async def open_browser_handler(url: str) -> dict:
+    """Opens a URL in the default browser."""
     try:
+        import webbrowser
+        webbrowser.open(url)
         logger.info(f"🌐 Opening browser URL: {url}")
-        
-        # Try detected browser first
-        browser_name = get_default_browser()
-        if browser_name == "brave":
-            brave_path = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
-            webbrowser.register('brave', None, webbrowser.BackgroundBrowser(brave_path))
-            webbrowser.get('brave').open(url)
-        else:
-            webbrowser.get().open(url)
-            
-        cl.run_sync(
-            cl.Message(
-                content=f"✅ Opened {url} in your browser"
-            ).send()
-        )
-            
-        return {"status": "success", "message": f"Opened {url} in browser"}
-    except webbrowser.Error as e:
-        error_msg = f"❌ Browser error: {str(e)}"
-        logger.error(error_msg)
-        cl.run_sync(cl.Message(content=error_msg).send())
-        return {"status": "error", "message": str(e)}
+        return {"status": "success", "url": url}
     except Exception as e:
-        error_msg = f"❌ Unexpected error: {str(e)}"
-        logger.error(error_msg)
-        cl.run_sync(cl.Message(content=error_msg).send())
+        logger.error(f"Failed to open browser: {str(e)}")
         return {"status": "error", "message": str(e)}
 
 open_browser = (open_browser_def, open_browser_handler)
